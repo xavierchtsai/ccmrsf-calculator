@@ -19,12 +19,20 @@ The page runs entirely in the browser; no data leave the user's computer. `ccmrs
 
 Abnormalities marked *Unknown* are treated as absent, as in model development. The ELN-2022 group shown alongside is derived from the entered variables.
 
+## Reference
+
+A manuscript describing the development and validation of the CCM-RSF model is in preparation, and the citation will be added here upon publication. Until then, please cite this repository: https://github.com/xavierchtsai/ccmrsf-calculator
+
 ## Disclaimer
 
-For research use only. The calculator is not intended to guide individual treatment decisions.
+This calculator is provided for research and educational purposes only. It is not a medical device, has not been approved by any regulatory authority, and must not be used as the sole basis for diagnosis or treatment decisions. Predictions are population-level estimates derived from the cohorts described above and may not apply to patients who differ from them, including patients with APL, secondary or therapy-related AML, or those not treated with intensive induction. Clinical decisions should be made by qualified physicians who consider the full clinical context.
 
-Division of Hematology, Department of Internal Medicine, National Taiwan University Hospital.
+All calculations run locally in the browser; no patient data are transmitted or stored.
+
+## Contact
+
+Questions and comments: Xavier Cheng-Hong Tsai, Division of Hematology, Department of Internal Medicine, National Taiwan University Hospital, Taipei, Taiwan (xavierchtsai@ntu.edu.tw).
 
 ## License
 
-MIT License (see `LICENSE`).
+The source code of this calculator is released under the [MIT License](LICENSE). The license covers the code only; it does not grant any right to use the model outputs for clinical care, and use of the model in publications should be acknowledged as described under Reference.
