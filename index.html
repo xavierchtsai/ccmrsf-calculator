@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCM-RSF AML Calculator</title>
+<style>
+:root {
+  --bg: #f6f7f9; --card: #ffffff; --ink: #1d2433; --muted: #5d6677; --line: #dde1e8;
+  --accent: #1f5fa8; --adv: #c0392b; --int: #d68910; --fav: #1e8449; --unk: #8a93a3;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+       font: 15px/1.5 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+header { background: var(--accent); color: #fff; padding: 22px 16px; }
+header .wrap, main, footer .wrap { max-width: 1180px; margin: 0 auto; }
+header h1 { margin: 0; font-size: 24px; font-weight: 650; }
+header p { margin: 4px 0 0; opacity: .9; }
+main { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; padding: 20px 16px; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
+.card h2 { font-size: 16px; margin: 0 0 12px; color: var(--accent); }
+.card h3 { font-size: 13px; margin: 14px 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px 16px; }
+.card > .grid2:has(.yn), #mut .grid2 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+label.num { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); }
+label.num input, label.num select { margin-top: 4px; padding: 7px 9px; font-size: 15px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); }
+.yn { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px dashed #eef0f4; }
+.yn .lab { font-size: 14px; }
+.yn .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+.yn .seg button { border: 0; background: #fff; padding: 3px 9px; font-size: 12px; cursor: pointer; color: var(--muted); }
+.yn .seg button + button { border-left: 1px solid var(--line); }
+.yn .seg button.on[data-v="1"] { background: var(--adv); color: #fff; }
+.yn .seg button.on[data-v="0"] { background: #e8ecf2; color: var(--ink); }
+.yn .seg button.on[data-v="u"] { background: var(--unk); color: #fff; }
+i.g { font-style: italic; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn { border: 0; border-radius: 7px; padding: 10px 18px; font-size: 15px; cursor: pointer; }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.ghost { background: #e8ecf2; color: var(--ink); }
+.err { color: var(--adv); font-size: 13px; margin-top: 8px; min-height: 1em; }
+.result-empty { color: var(--muted); }
+.badges { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.badge { border-radius: 9px; padding: 12px; color: #fff; }
+.badge .k { font-size: 12px; opacity: .9; text-transform: uppercase; letter-spacing: .04em; }
+.badge .v { font-size: 22px; font-weight: 650; text-transform: capitalize; }
+.bg-adverse { background: var(--adv); } .bg-intermediate { background: var(--int); } .bg-favorable { background: var(--fav); }
+.score { margin: 14px 0 4px; font-size: 14px; color: var(--muted); }
+.score b { color: var(--ink); font-size: 18px; }
+.bar { position: relative; height: 12px; border-radius: 6px; margin: 6px 0 20px;
+       background: linear-gradient(90deg, var(--fav) 0 33.3%, var(--int) 33.3% 66.6%, var(--adv) 66.6% 100%); }
+.bar .pin { position: absolute; top: -5px; width: 4px; height: 22px; background: var(--ink); border-radius: 2px; transform: translateX(-2px); }
+.bar .tick { position: absolute; top: 14px; font-size: 11px; color: var(--muted); transform: translateX(-50%); }
+table.os { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.os th, table.os td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+table.os td.n { text-align: right; font-variant-numeric: tabular-nums; }
+svg text { font: 11px -apple-system, "Segoe UI", Roboto, Arial, sans-serif; fill: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 4px; }
+.legend span::before { content: ""; display: inline-block; width: 18px; height: 3px; margin-right: 5px; vertical-align: middle; background: var(--c); }
+.legend span.dash::before { background: repeating-linear-gradient(90deg, var(--c) 0 5px, transparent 5px 8px); }
+.note { font-size: 13px; color: var(--muted); }
+.note li { margin-bottom: 4px; }
+footer { padding: 18px 16px 30px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>CCM-RSF risk calculator for AML</h1>
+  <p>Clinical-Cytogenetic-Molecular Random Survival Forest for adults with de novo, non-APL AML treated with intensive induction</p>
+</div></header>
+
+<main>
+  <section>
+    <form id="form" novalidate>
+      <div class="card">
+        <h2>Patient and laboratory data at diagnosis</h2>
+        <div class="grid2">
+          <label class="num">Age (years)<input id="Age" type="number" min="15" max="100" step="1" required></label>
+          <label class="num">Sex<select id="Gender"><option value="">Select</option><option value="1">Male</option><option value="0">Female</option></select></label>
+          <label class="num">WBC (×10⁹/L)<input id="WBC" type="number" min="0" max="1000" step="0.01" required></label>
+          <label class="num">Hemoglobin (g/dL)<input id="Hb" type="number" min="1" max="25" step="0.1" required></label>
+          <label class="num">Platelets (×10⁹/L)<input id="Plt" type="number" min="0" max="2000" step="1" required></label>
+          <label class="num">Bone marrow blasts (%)<input id="BM_Blast" type="number" min="0" max="100" step="0.1" required></label>
+        </div>
+      </div>
+      <div class="card" id="cyto"><h2>Cytogenetics</h2></div>
+      <div class="card" id="mut"><h2>Gene mutations</h2></div>
+      <div class="card">
+        <div class="actions">
+          <button class="btn primary" type="submit">Calculate</button>
+          <button class="btn ghost" type="button" id="reset">Reset</button>
+        </div>
+        <div class="err" id="err"></div>
+      </div>
+    </form>
+  </section>
+
+  <section>
+    <div class="card" id="result">
+      <h2>Result</h2>
+      <p class="result-empty">Enter the patient data and press <b>Calculate</b>.</p>
+    </div>
+    <div class="card note">
+      <h2>Notes</h2>
+      <ul>
+        <li>The model was trained on 801 patients from National Taiwan University Hospital and validated without refitting in the UK-NCRI (n=1,734), AMLSG (n=1,475) and Beat AML (n=305) cohorts.</li>
+        <li>Risk groups use cutoffs locked at the tertiles of the development cohort (risk score 52.86 and 97.52).</li>
+        <li>An abnormality marked <b>Unknown</b> is treated as absent, as in model development.</li>
+        <li>ELN-2022 is derived from the entered variables. "Other ELN-2022 adverse abnormality" affects the ELN-2022 group only; it is not a model input.</li>
+        <li>Reference curves are Kaplan-Meier estimates of the NTUH development cohort by CCM-RSF group.</li>
+        <li>For research use only. Not intended to guide individual treatment decisions.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  CCM-RSF model version 53feat_20261012 · Division of Hematology, Department of Internal Medicine, National Taiwan University Hospital
+</div></footer>
+
+<script src="model.js"></script>
+<script src="ccmrsf.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
