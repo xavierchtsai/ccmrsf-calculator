@@ -24,3 +24,7 @@ Abnormalities marked *Unknown* are treated as absent, as in model development. T
 For research use only. The calculator is not intended to guide individual treatment decisions.
 
 Division of Hematology, Department of Internal Medicine, National Taiwan University Hospital.
+
+## License
+
+MIT License (see `LICENSE`).
